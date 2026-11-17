@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#5b3a29">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Clases caballo">
+<title>Clases de caballo</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🐴</text></svg>">
+<style>
+  :root {
+    --bg: #faf6f1;
+    --card: #ffffff;
+    --ink: #2b211b;
+    --muted: #8a7b70;
+    --line: #eadfd4;
+    --brand: #5b3a29;
+    --profe: #2e9d5b;
+    --profa: #2f6fd6;
+    --sola: #e0a800;
+    --nadie: #d6453d;
+  }
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  body {
+    margin: 0; background: var(--bg); color: var(--ink);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    padding: env(safe-area-inset-top) 0 calc(env(safe-area-inset-bottom) + 16px);
+  }
+  .wrap { max-width: 480px; margin: 0 auto; padding: 12px; }
+  header { display: flex; align-items: center; justify-content: space-between; margin: 4px 0 12px; }
+  header h1 { font-size: 22px; margin: 0; text-transform: capitalize; }
+  .nav { display: flex; gap: 6px; }
+  .nav button {
+    border: 1px solid var(--line); background: var(--card); color: var(--ink);
+    width: 40px; height: 40px; border-radius: 12px; font-size: 18px;
+  }
+  .nav button.hoy { width: auto; padding: 0 12px; font-size: 14px; }
+  .cal { background: var(--card); border-radius: 16px; padding: 8px; box-shadow: 0 1px 3px rgba(0,0,0,.06); }
+  .dows, .grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; }
+  .dows div { text-align: center; font-size: 12px; color: var(--muted); padding: 4px 0; font-weight: 600; }
+  .day {
+    aspect-ratio: 1; border-radius: 10px; border: none; background: #f6f0ea;
+    font-size: 15px; color: var(--ink); position: relative; padding: 0;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+  }
+  .day.vacio { background: transparent; }
+  .day.hoy { outline: 2px solid var(--brand); outline-offset: -2px; font-weight: 700; }
+  .day .tag { font-size: 9px; font-weight: 700; margin-top: 2px; letter-spacing: .3px; }
+  .day.profe { background: var(--profe); color: #fff; }
+  .day.profa { background: var(--profa); color: #fff; }
+  .day.sola  { background: var(--sola);  color: #2b211b; }
+  .day.nadie { background: var(--nadie); color: #fff; }
+  .day.nota::after {
+    content: ""; position: absolute; top: 5px; right: 5px; width: 6px; height: 6px;
+    border-radius: 50%; background: currentColor; opacity: .7;
+  }
+  .resumen { margin-top: 14px; background: var(--card); border-radius: 16px; padding: 12px 14px; box-shadow: 0 1px 3px rgba(0,0,0,.06); }
+  .resumen h2 { font-size: 15px; margin: 0 0 8px; }
+  .fila { display: flex; align-items: center; gap: 10px; padding: 6px 0; border-top: 1px solid var(--line); }
+  .fila:first-of-type { border-top: none; }
+  .dot { width: 14px; height: 14px; border-radius: 4px; flex: none; }
+  .fila .n { margin-left: auto; font-weight: 700; font-size: 17px; }
+  .total { font-size: 13px; color: var(--muted); margin-top: 6px; }
+  .acciones { display: flex; gap: 8px; margin-top: 14px; }
+  .acciones button {
+    flex: 1; border: 1px solid var(--line); background: var(--card); color: var(--ink);
+    padding: 10px; border-radius: 12px; font-size: 13px;
+  }
+  /* Hoja inferior */
+  .velo { position: fixed; inset: 0; background: rgba(0,0,0,.35); display: none; align-items: flex-end; justify-content: center; z-index: 10; }
+  .velo.abierto { display: flex; }
+  .hoja {
+    background: var(--card); width: 100%; max-width: 480px; border-radius: 20px 20px 0 0;
+    padding: 16px 16px calc(env(safe-area-inset-bottom) + 16px);
+    animation: sube .18s ease-out;
+  }
+  @keyframes sube { from { transform: translateY(40px); opacity: .5; } to { transform: none; opacity: 1; } }
+  .hoja h3 { margin: 0 0 12px; font-size: 17px; text-transform: capitalize; }
+  .opc { display: grid; gap: 8px; }
+  .opc button {
+    display: flex; align-items: center; gap: 12px; padding: 14px; border-radius: 14px;
+    border: 2px solid var(--line); background: #fff; font-size: 16px; color: var(--ink); text-align: left;
+  }
+  .opc button.sel { border-color: var(--ink); }
+  .opc .dot { width: 20px; height: 20px; border-radius: 6px; }
+  textarea {
+    width: 100%; margin-top: 10px; border: 1px solid var(--line); border-radius: 12px;
+    padding: 10px; font: inherit; font-size: 15px; resize: none; height: 64px;
+  }
+  .hoja .pie { display: flex; gap: 8px; margin-top: 10px; }
+  .hoja .pie button { flex: 1; padding: 13px; border-radius: 12px; font-size: 15px; border: none; }
+  .borrar { background: #f3ece6; color: var(--ink); }
+  .listo { background: var(--brand); color: #fff; font-weight: 600; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1 id="titulo"></h1>
+    <div class="nav">
+      <button id="ant" aria-label="Mes anterior">‹</button>
+      <button id="hoyBtn" class="hoy">Hoy</button>
+      <button id="sig" aria-label="Mes siguiente">›</button>
+    </div>
+  </header>
+
+  <div class="cal">
+    <div class="dows"><div>L</div><div>M</div><div>X</div><div>J</div><div>V</div><div>S</div><div>D</div></div>
+    <div class="grid" id="grid"></div>
+  </div>
+
+  <div class="resumen">
+    <h2 id="resTitulo">Resumen del mes</h2>
+    <div id="filas"></div>
+    <div class="total" id="total"></div>
+  </div>
+
+  <div class="acciones">
+    <button id="exportar">⬇︎ Copia de seguridad</button>
+    <button id="importar">⬆︎ Restaurar copia</button>
+    <input type="file" id="archivo" accept="application/json" hidden>
+  </div>
+</div>
+
+<div class="velo" id="velo">
+  <div class="hoja" role="dialog" aria-modal="true">
+    <h3 id="hojaTitulo"></h3>
+    <div class="opc" id="opciones"></div>
+    <textarea id="nota" placeholder="Nota (opcional): hora, caballo, pagado…"></textarea>
+    <div class="pie">
+      <button class="borrar" id="quitar">Quitar marca</button>
+      <button class="listo" id="listo">Listo</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const TIPOS = {
+  profe: { nombre: "Clase con el profesor", corto: "PROFE", color: "var(--profe)" },
+  profa: { nombre: "Clase con la profesora", corto: "PROFA", color: "var(--profa)" },
+  sola:  { nombre: "Mi hija sola",           corto: "SOLA",  color: "var(--sola)"  },
+  nadie: { nombre: "No vino ningún profesor", corto: "NADIE", color: "var(--nadie)" },
+};
+const CLAVE = "clases-caballo-v1";
+
+let datos = {};
+try { datos = JSON.parse(localStorage.getItem(CLAVE)) || {}; } catch (e) { datos = {}; }
+function guardar() {
+  try { localStorage.setItem(CLAVE, JSON.stringify(datos)); } catch (e) {}
+}
+
+const hoy = new Date();
+let vista = new Date(hoy.getFullYear(), hoy.getMonth(), 1);
+let diaAbierto = null;
+
+const pad = n => String(n).padStart(2, "0");
+const claveDia = (y, m, d) => `${y}-${pad(m + 1)}-${pad(d)}`;
+const fmtMes = new Intl.DateTimeFormat("es-ES", { month: "long", year: "numeric" });
+const fmtDia = new Intl.DateTimeFormat("es-ES", { weekday: "long", day: "numeric", month: "long" });
+
+function pintar() {
+  const y = vista.getFullYear(), m = vista.getMonth();
+  document.getElementById("titulo").textContent = fmtMes.format(vista);
+  const grid = document.getElementById("grid");
+  grid.innerHTML = "";
+  const offset = (new Date(y, m, 1).getDay() + 6) % 7; // lunes primero
+  const diasMes = new Date(y, m + 1, 0).getDate();
+  for (let i = 0; i < offset; i++) {
+    const v = document.createElement("div"); v.className = "day vacio"; grid.appendChild(v);
+  }
+  const cuenta = { profe: 0, profa: 0, sola: 0, nadie: 0 };
+  for (let d = 1; d <= diasMes; d++) {
+    const k = claveDia(y, m, d);
+    const reg = datos[k];
+    const b = document.createElement("button");
+    b.className = "day";
+    if (y === hoy.getFullYear() && m === hoy.getMonth() && d === hoy.getDate()) b.classList.add("hoy");
+    b.innerHTML = `<span>${d}</span>`;
+    if (reg && reg.tipo) {
+      b.classList.add(reg.tipo);
+      b.innerHTML += `<span class="tag">${TIPOS[reg.tipo].corto}</span>`;
+      cuenta[reg.tipo]++;
+    }
+    if (reg && reg.nota) b.classList.add("nota");
+    b.onclick = () => abrir(y, m, d);
+    grid.appendChild(b);
+  }
+  // resumen
+  document.getElementById("resTitulo").textContent = "Resumen de " + new Intl.DateTimeFormat("es-ES", { month: "long" }).format(vista);
+  const filas = document.getElementById("filas");
+  filas.innerHTML = "";
+  for (const [t, info] of Object.entries(TIPOS)) {
+    filas.innerHTML += `<div class="fila"><span class="dot" style="background:${info.color}"></span>${info.nombre}<span class="n">${cuenta[t]}</span></div>`;
+  }
+  const clases = cuenta.profe + cuenta.profa;
+  document.getElementById("total").textContent = `Clases con profesor/a: ${clases} · Días marcados: ${clases + cuenta.sola + cuenta.nadie}`;
+}
+
+function abrir(y, m, d) {
+  diaAbierto = claveDia(y, m, d);
+  const reg = datos[diaAbierto] || {};
+  document.getElementById("hojaTitulo").textContent = fmtDia.format(new Date(y, m, d));
+  const cont = document.getElementById("opciones");
+  cont.innerHTML = "";
+  for (const [t, info] of Object.entries(TIPOS)) {
+    const b = document.createElement("button");
+    b.innerHTML = `<span class="dot" style="background:${info.color}"></span>${info.nombre}`;
+    if (reg.tipo === t) b.classList.add("sel");
+    b.onclick = () => {
+      datos[diaAbierto] = { ...(datos[diaAbierto] || {}), tipo: t };
+      [...cont.children].forEach(c => c.classList.remove("sel"));
+      b.classList.add("sel");
+      guardar(); pintar();
+    };
+    cont.appendChild(b);
+  }
+  document.getElementById("nota").value = reg.nota || "";
+  document.getElementById("velo").classList.add("abierto");
+}
+
+function cerrar() {
+  if (diaAbierto) {
+    const nota = document.getElementById("nota").value.trim();
+    const reg = datos[diaAbierto] || {};
+    if (nota) reg.nota = nota; else delete reg.nota;
+    if (reg.tipo || reg.nota) datos[diaAbierto] = reg; else delete datos[diaAbierto];
+    guardar();
+  }
+  diaAbierto = null;
+  document.getElementById("velo").classList.remove("abierto");
+  pintar();
+}
+
+document.getElementById("listo").onclick = cerrar;
+document.getElementById("quitar").onclick = () => {
+  delete datos[diaAbierto];
+  document.getElementById("nota").value = "";
+  guardar(); cerrar();
+};
+document.getElementById("velo").onclick = e => { if (e.target.id === "velo") cerrar(); };
+document.getElementById("ant").onclick = () => { vista.setMonth(vista.getMonth() - 1); pintar(); };
+document.getElementById("sig").onclick = () => { vista.setMonth(vista.getMonth() + 1); pintar(); };
+document.getElementById("hoyBtn").onclick = () => { vista = new Date(hoy.getFullYear(), hoy.getMonth(), 1); pintar(); };
+
+// Copia de seguridad
+document.getElementById("exportar").onclick = () => {
+  const blob = new Blob([JSON.stringify(datos, null, 2)], { type: "application/json" });
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = `clases-caballo-${claveDia(hoy.getFullYear(), hoy.getMonth(), hoy.getDate())}.json`;
+  a.click();
+  setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+};
+document.getElementById("importar").onclick = () => document.getElementById("archivo").click();
+document.getElementById("archivo").onchange = e => {
+  const f = e.target.files[0]; if (!f) return;
+  const r = new FileReader();
+  r.onload = () => {
+    try {
+      const nuevo = JSON.parse(r.result);
+      if (typeof nuevo !== "object" || Array.isArray(nuevo)) throw 0;
+      datos = { ...datos, ...nuevo };
+      guardar(); pintar();
+    } catch (err) {
+      document.getElementById("total").textContent = "⚠️ Ese archivo no es una copia válida.";
+    }
+  };
+  r.readAsText(f);
+  e.target.value = "";
+};
+
+pintar();
+</script>
+</body>
+</html>
