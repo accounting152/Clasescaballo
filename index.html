@@ -18,6 +18,7 @@
     --brand: #5b3a29;
     --profe: #2e9d5b;
     --profa: #2f6fd6;
+    --compe: #e84393;
     --sola: #e0a800;
     --nadie: #d6453d;
     --robinna: #8e44ad;
@@ -51,6 +52,7 @@
   .day .tag { font-size: 9px; font-weight: 700; margin-top: 2px; letter-spacing: .3px; }
   .day.profe { background: var(--profe); color: #fff; }
   .day.profa { background: var(--profa); color: #fff; }
+  .day.compe { background: var(--compe); color: #fff; }
   .day.sola  { background: var(--sola);  color: #2b211b; }
   .day.nadie { background: var(--nadie); color: #fff; }
   .day.nota::after {
@@ -149,6 +151,7 @@
 const TIPOS = {
   profe: { nombre: "Clase con el profesor", corto: "PROFE", color: "var(--profe)" },
   profa: { nombre: "Clase con la profesora", corto: "PROFA", color: "var(--profa)" },
+  compe: { nombre: "Competición",            corto: "COMPE", color: "var(--compe)" },
   sola:  { nombre: "Mi hija sola",           corto: "SOLA",  color: "var(--sola)"  },
   nadie: { nombre: "No vino ningún profesor", corto: "NADIE", color: "var(--nadie)" },
 };
@@ -184,7 +187,7 @@ function pintar() {
   for (let i = 0; i < offset; i++) {
     const v = document.createElement("div"); v.className = "day vacio"; grid.appendChild(v);
   }
-  const cuenta = { profe: 0, profa: 0, sola: 0, nadie: 0 };
+  const cuenta = { profe: 0, profa: 0, compe: 0, sola: 0, nadie: 0 };
   const cuentaH = { robinna: 0, cornelios: 0 };
   for (let d = 1; d <= diasMes; d++) {
     const k = claveDia(y, m, d);
@@ -218,7 +221,7 @@ function pintar() {
     filas.innerHTML += `<div class="fila"><span class="dot" style="background:${info.color}"></span>${info.nombre}<span class="n">${cuentaH[h]}</span></div>`;
   }
   const clases = cuenta.profe + cuenta.profa;
-  document.getElementById("total").textContent = `Clases con profesor/a: ${clases} · Días marcados: ${clases + cuenta.sola + cuenta.nadie}`;
+  document.getElementById("total").textContent = `Clases con profesor/a: ${clases} · Días marcados: ${clases + cuenta.compe + cuenta.sola + cuenta.nadie}`;
 }
 
 function abrir(y, m, d) {

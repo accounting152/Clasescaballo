@@ -4,6 +4,7 @@ Calendario para marcar los días de clase de caballo:
 
 - 🟢 Clase con el profesor
 - 🔵 Clase con la profesora
+- 🩷 Competición
 - 🟡 Mi hija sola
 - 🔴 No vino ningún profesor
 
