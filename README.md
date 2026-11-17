@@ -2,11 +2,11 @@
 
 Calendario para marcar los días de clase de caballo:
 
-- 🟢 Clase con el profesor
-- 🔵 Clase con la profesora
+- 🟢 Tejero
+- 🔵 Rocío
 - 🩷 Competición
-- 🟡 Mi hija sola
-- 🔴 No vino ningún profesor
+- 🟡 Adri sola
+- 🔴 No avisaron
 
 Y, compatibles con las anteriores:
 

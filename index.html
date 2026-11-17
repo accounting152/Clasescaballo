@@ -32,7 +32,7 @@
   }
   .wrap { max-width: 480px; margin: 0 auto; padding: 12px; }
   header { display: flex; align-items: center; justify-content: space-between; margin: 4px 0 12px; }
-  header h1 { font-size: 22px; margin: 0; text-transform: capitalize; }
+  header h1 { font-size: 20px; margin: 0; }
   .nav { display: flex; gap: 6px; }
   .nav button {
     border: 1px solid var(--line); background: var(--card); color: var(--ink);
@@ -88,7 +88,7 @@
     animation: sube .18s ease-out;
   }
   @keyframes sube { from { transform: translateY(40px); opacity: .5; } to { transform: none; opacity: 1; } }
-  .hoja h3 { margin: 0 0 12px; font-size: 17px; text-transform: capitalize; }
+  .hoja h3 { margin: 0 0 12px; font-size: 17px; }
   .opc { display: grid; gap: 8px; }
   .opc button {
     display: flex; align-items: center; gap: 12px; padding: 14px; border-radius: 14px;
@@ -149,11 +149,11 @@
 
 <script>
 const TIPOS = {
-  profe: { nombre: "Clase con el profesor", corto: "PROFE", color: "var(--profe)" },
-  profa: { nombre: "Clase con la profesora", corto: "PROFA", color: "var(--profa)" },
+  profe: { nombre: "Tejero",      corto: "TEJERO", color: "var(--profe)" },
+  profa: { nombre: "Rocío",      corto: "ROCÍO", color: "var(--profa)" },
   compe: { nombre: "Competición",            corto: "COMPE", color: "var(--compe)" },
-  sola:  { nombre: "Mi hija sola",           corto: "SOLA",  color: "var(--sola)"  },
-  nadie: { nombre: "No vino ningún profesor", corto: "NADIE", color: "var(--nadie)" },
+  sola:  { nombre: "Adri sola",     corto: "ADRI",  color: "var(--sola)"  },
+  nadie: { nombre: "No avisaron", corto: "NO AV.", color: "var(--nadie)" },
 };
 const HERRAJES = {
   robinna:   { nombre: "Herraje de Robinna",   corto: "R", color: "var(--robinna)" },
@@ -172,6 +172,7 @@ const hoy = new Date();
 let vista = new Date(hoy.getFullYear(), hoy.getMonth(), 1);
 let diaAbierto = null;
 
+const mayus = t => t.charAt(0).toUpperCase() + t.slice(1);
 const pad = n => String(n).padStart(2, "0");
 const claveDia = (y, m, d) => `${y}-${pad(m + 1)}-${pad(d)}`;
 const fmtMes = new Intl.DateTimeFormat("es-ES", { month: "long", year: "numeric" });
@@ -179,7 +180,7 @@ const fmtDia = new Intl.DateTimeFormat("es-ES", { weekday: "long", day: "numeric
 
 function pintar() {
   const y = vista.getFullYear(), m = vista.getMonth();
-  document.getElementById("titulo").textContent = fmtMes.format(vista);
+  document.getElementById("titulo").textContent = mayus(fmtMes.format(vista).replace(" de ", " "));
   const grid = document.getElementById("grid");
   grid.innerHTML = "";
   const offset = (new Date(y, m, 1).getDay() + 6) % 7; // lunes primero
@@ -221,13 +222,13 @@ function pintar() {
     filas.innerHTML += `<div class="fila"><span class="dot" style="background:${info.color}"></span>${info.nombre}<span class="n">${cuentaH[h]}</span></div>`;
   }
   const clases = cuenta.profe + cuenta.profa;
-  document.getElementById("total").textContent = `Clases con profesor/a: ${clases} · Días marcados: ${clases + cuenta.compe + cuenta.sola + cuenta.nadie}`;
+  document.getElementById("total").textContent = `Clases con Tejero o Rocío: ${clases} · Días marcados: ${clases + cuenta.compe + cuenta.sola + cuenta.nadie}`;
 }
 
 function abrir(y, m, d) {
   diaAbierto = claveDia(y, m, d);
   const reg = datos[diaAbierto] || {};
-  document.getElementById("hojaTitulo").textContent = fmtDia.format(new Date(y, m, d));
+  document.getElementById("hojaTitulo").textContent = mayus(fmtDia.format(new Date(y, m, d)));
   const cont = document.getElementById("opciones");
   cont.innerHTML = "";
   for (const [t, info] of Object.entries(TIPOS)) {
