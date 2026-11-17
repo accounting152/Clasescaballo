@@ -20,6 +20,8 @@
     --profa: #2f6fd6;
     --sola: #e0a800;
     --nadie: #d6453d;
+    --robinna: #8e44ad;
+    --cornelios: #a0522d;
   }
   * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
   body {
@@ -55,6 +57,14 @@
     content: ""; position: absolute; top: 5px; right: 5px; width: 6px; height: 6px;
     border-radius: 50%; background: currentColor; opacity: .7;
   }
+  .herr { display: flex; justify-content: center; gap: 2px; margin-top: 2px; }
+  .herr span {
+    width: 12px; height: 12px; border-radius: 50%; font-size: 7px; font-weight: 800; line-height: 11px;
+    color: #fff; border: 1px solid #fff; text-align: center;
+  }
+  .day > span:first-child, .day .tag { line-height: 1.1; }
+  .seccion { font-size: 12px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: .5px; margin: 14px 0 6px; }
+  .opc button .check { margin-left: auto; font-size: 18px; }
   .resumen { margin-top: 14px; background: var(--card); border-radius: 16px; padding: 12px 14px; box-shadow: 0 1px 3px rgba(0,0,0,.06); }
   .resumen h2 { font-size: 15px; margin: 0 0 8px; }
   .fila { display: flex; align-items: center; gap: 10px; padding: 6px 0; border-top: 1px solid var(--line); }
@@ -129,7 +139,7 @@
     <div class="opc" id="opciones"></div>
     <textarea id="nota" placeholder="Nota (opcional): hora, caballo, pagado…"></textarea>
     <div class="pie">
-      <button class="borrar" id="quitar">Quitar marca</button>
+      <button class="borrar" id="quitar">Quitar todo</button>
       <button class="listo" id="listo">Listo</button>
     </div>
   </div>
@@ -142,6 +152,11 @@ const TIPOS = {
   sola:  { nombre: "Mi hija sola",           corto: "SOLA",  color: "var(--sola)"  },
   nadie: { nombre: "No vino ningún profesor", corto: "NADIE", color: "var(--nadie)" },
 };
+const HERRAJES = {
+  robinna:   { nombre: "Herraje de Robinna",   corto: "R", color: "var(--robinna)" },
+  cornelios: { nombre: "Herraje de Cornelios", corto: "C", color: "var(--cornelios)" },
+};
+const tieneAlgo = reg => reg && (reg.tipo || reg.nota || (reg.herrajes && reg.herrajes.length));
 const CLAVE = "clases-caballo-v1";
 
 let datos = {};
@@ -170,6 +185,7 @@ function pintar() {
     const v = document.createElement("div"); v.className = "day vacio"; grid.appendChild(v);
   }
   const cuenta = { profe: 0, profa: 0, sola: 0, nadie: 0 };
+  const cuentaH = { robinna: 0, cornelios: 0 };
   for (let d = 1; d <= diasMes; d++) {
     const k = claveDia(y, m, d);
     const reg = datos[k];
@@ -182,6 +198,11 @@ function pintar() {
       b.innerHTML += `<span class="tag">${TIPOS[reg.tipo].corto}</span>`;
       cuenta[reg.tipo]++;
     }
+    if (reg && reg.herrajes && reg.herrajes.length) {
+      b.classList.add("conHerr");
+      b.innerHTML += `<span class="herr">${reg.herrajes.map(h => `<span style="background:${HERRAJES[h].color}">${HERRAJES[h].corto}</span>`).join("")}</span>`;
+      reg.herrajes.forEach(h => cuentaH[h]++);
+    }
     if (reg && reg.nota) b.classList.add("nota");
     b.onclick = () => abrir(y, m, d);
     grid.appendChild(b);
@@ -192,6 +213,9 @@ function pintar() {
   filas.innerHTML = "";
   for (const [t, info] of Object.entries(TIPOS)) {
     filas.innerHTML += `<div class="fila"><span class="dot" style="background:${info.color}"></span>${info.nombre}<span class="n">${cuenta[t]}</span></div>`;
+  }
+  for (const [h, info] of Object.entries(HERRAJES)) {
+    filas.innerHTML += `<div class="fila"><span class="dot" style="background:${info.color}"></span>${info.nombre}<span class="n">${cuentaH[h]}</span></div>`;
   }
   const clases = cuenta.profe + cuenta.profa;
   document.getElementById("total").textContent = `Clases con profesor/a: ${clases} · Días marcados: ${clases + cuenta.sola + cuenta.nadie}`;
@@ -205,14 +229,36 @@ function abrir(y, m, d) {
   cont.innerHTML = "";
   for (const [t, info] of Object.entries(TIPOS)) {
     const b = document.createElement("button");
+    b.className = "tipo";
     b.innerHTML = `<span class="dot" style="background:${info.color}"></span>${info.nombre}`;
     if (reg.tipo === t) b.classList.add("sel");
     b.onclick = () => {
       datos[diaAbierto] = { ...(datos[diaAbierto] || {}), tipo: t };
-      [...cont.children].forEach(c => c.classList.remove("sel"));
+      [...cont.querySelectorAll("button.tipo")].forEach(c => c.classList.remove("sel"));
       b.classList.add("sel");
       guardar(); pintar();
     };
+    cont.appendChild(b);
+  }
+  const sec = document.createElement("div");
+  sec.className = "seccion"; sec.textContent = "Herrajes";
+  cont.appendChild(sec);
+  for (const [h, info] of Object.entries(HERRAJES)) {
+    const b = document.createElement("button");
+    const marcado = () => ((datos[diaAbierto] || {}).herrajes || []).includes(h);
+    const dibujar = () => {
+      b.innerHTML = `<span class="dot" style="background:${info.color}"></span>${info.nombre}<span class="check">${marcado() ? "✅" : "⬜️"}</span>`;
+      b.classList.toggle("sel", marcado());
+    };
+    b.onclick = () => {
+      const r = datos[diaAbierto] = { ...(datos[diaAbierto] || {}) };
+      const lista = new Set(r.herrajes || []);
+      lista.has(h) ? lista.delete(h) : lista.add(h);
+      r.herrajes = Object.keys(HERRAJES).filter(x => lista.has(x));
+      if (!r.herrajes.length) delete r.herrajes;
+      dibujar(); guardar(); pintar();
+    };
+    dibujar();
     cont.appendChild(b);
   }
   document.getElementById("nota").value = reg.nota || "";
@@ -224,7 +270,7 @@ function cerrar() {
     const nota = document.getElementById("nota").value.trim();
     const reg = datos[diaAbierto] || {};
     if (nota) reg.nota = nota; else delete reg.nota;
-    if (reg.tipo || reg.nota) datos[diaAbierto] = reg; else delete datos[diaAbierto];
+    if (tieneAlgo(reg)) datos[diaAbierto] = reg; else delete datos[diaAbierto];
     guardar();
   }
   diaAbierto = null;
