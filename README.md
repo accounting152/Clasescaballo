@@ -7,6 +7,7 @@ Calendario para marcar los días de clase de caballo:
 - 🩷 Competición
 - 🟡 Adri sola
 - 🔴 No avisaron
+- 🌧️ Mal tiempo
 
 Y, compatibles con las anteriores:
 
